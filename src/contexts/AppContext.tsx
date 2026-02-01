@@ -13,6 +13,13 @@ export interface User {
   authorityScore: number;
   affiliateCode?: string;
   createdAt: string;
+  // New profile fields
+  avatarUrl?: string;
+  bio?: string;
+  phone?: string;
+  company?: string;
+  website?: string;
+  location?: string;
 }
 
 interface AppContextType {
@@ -25,6 +32,7 @@ interface AppContextType {
   logout: () => Promise<void>;
   updateUserRole: (userId: string, role: UserRole) => Promise<void>;
   updateUserTier: (userId: string, tier: SubscriptionTier) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,6 +48,12 @@ const DEMO_USERS: Record<string, { password: string; user: User }> = {
       role: 'builder',
       subscriptionTier: 'pro',
       authorityScore: 78,
+      avatarUrl: '',
+      bio: 'Professional SEO specialist',
+      phone: '+1 (555) 123-4567',
+      company: 'SEO Masters Inc.',
+      website: 'https://seomasters.com',
+      location: 'New York, NY',
       createdAt: new Date().toISOString(),
     }
   },
@@ -53,6 +67,12 @@ const DEMO_USERS: Record<string, { password: string; user: User }> = {
       subscriptionTier: 'enterprise',
       authorityScore: 100,
       affiliateCode: 'ADMIN001',
+      avatarUrl: '',
+      bio: 'Platform administrator',
+      phone: '+1 (555) 999-0000',
+      company: 'SEO Flood AI',
+      website: 'https://seo-flood-ai.vercel.app',
+      location: 'Global',
       createdAt: new Date().toISOString(),
     }
   },
@@ -65,6 +85,12 @@ const DEMO_USERS: Record<string, { password: string; user: User }> = {
       role: 'admin',
       subscriptionTier: 'enterprise',
       authorityScore: 95,
+      avatarUrl: '',
+      bio: 'Platform moderator',
+      phone: '+1 (555) 888-7777',
+      company: 'SEO Flood AI',
+      website: 'https://seo-flood-ai.vercel.app',
+      location: 'United States',
       createdAt: new Date().toISOString(),
     }
   }
@@ -83,6 +109,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsLoading(false);
   }, []);
 
+  const refreshUser = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const updatedUser: User = {
+          id: data.id,
+          email: data.email,
+          fullName: data.full_name,
+          role: data.role,
+          subscriptionTier: data.subscription_tier,
+          authorityScore: data.authority_score || 0,
+          affiliateCode: data.affiliate_code,
+          avatarUrl: data.avatar_url,
+          bio: data.bio,
+          phone: data.phone,
+          company: data.company,
+          website: data.website,
+          location: data.location,
+          createdAt: data.created_at,
+        };
+        setUser(updatedUser);
+        localStorage.setItem('seoflood_user', JSON.stringify(updatedUser));
+      }
+    } catch (error) {
+      console.error('Refresh user error:', error);
+    }
+  };
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     
@@ -95,7 +158,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: true };
     }
 
-    // Try Supabase auth (when configured)
+    // Try Supabase auth
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -119,6 +182,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           subscriptionTier: profile?.subscription_tier || 'free',
           authorityScore: profile?.authority_score || 0,
           affiliateCode: profile?.affiliate_code,
+          avatarUrl: profile?.avatar_url,
+          bio: profile?.bio,
+          phone: profile?.phone,
+          company: profile?.company,
+          website: profile?.website,
+          location: profile?.location,
           createdAt: profile?.created_at,
         };
 
@@ -127,20 +196,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch (error) {
       console.error('Login error:', error);
-      // For demo, create a new user
-      const newUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email,
-        fullName: email.split('@')[0],
-        role: 'user',
-        subscriptionTier: 'free',
-        authorityScore: 0,
-        createdAt: new Date().toISOString(),
-      };
-      setUser(newUser);
-      localStorage.setItem('seoflood_user', JSON.stringify(newUser));
       setIsLoading(false);
-      return { success: true };
+      return { success: false, error: 'Invalid credentials' };
     }
 
     setIsLoading(false);
@@ -231,6 +288,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       logout,
       updateUserRole,
       updateUserTier,
+      refreshUser,
     }}>
       {children}
     </AppContext.Provider>
