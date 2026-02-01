@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+    --primary: 348 100% 61%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 20 100% 60%;
+    --muted: 240 10% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 348 100% 61%;
+    --border: 240 10% 15%;
+    --ring: 348 100% 61%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; }
+  body { 
+    @apply bg-[#0a0a0f] text-white antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Holographic Effects */
+.holographic-border {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 55, 95, 0.1), rgba(255, 107, 53, 0.1));
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.holographic-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #ff375f, #ff6b35);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 55, 95, 0.3);
+  box-shadow: 0 0 30px rgba(255, 55, 95, 0.15);
+}
+
+/* Neon Glow */
+.neon-glow {
+  box-shadow: 0 0 20px rgba(255, 55, 95, 0.4), 0 0 40px rgba(255, 55, 95, 0.2);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(255, 55, 95, 0.6), 0 0 40px rgba(255, 55, 95, 0.3);
+}
+
+/* Circuit Pattern */
+.circuit-pattern {
+  background-image: 
+    linear-gradient(90deg, rgba(255, 55, 95, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(255, 55, 95, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #ff375f, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-[#ff375f] to-[#ff6b35] text-white font-semibold rounded-lg transition-all duration-300;
+}
+.btn-primary:hover {
+  @apply transform scale-105;
+  box-shadow: 0 0 30px rgba(255, 55, 95, 0.5);
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-transparent border border-[#ff375f] text-[#ff375f] font-semibold rounded-lg transition-all duration-300;
+}
+.btn-secondary:hover {
+  @apply bg-[#ff375f]/10;
+  box-shadow: 0 0 20px rgba(255, 55, 95, 0.3);
+}
+
+/* Inputs */
+.input-holographic {
+  @apply w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/40 transition-all duration-300;
+}
+.input-holographic:focus {
+  @apply outline-none border-[#ff375f]/50;
+  box-shadow: 0 0 20px rgba(255, 55, 95, 0.2);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ff375f, #ff6b35);
+  border-radius: 4px;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.float-animation { animation: float 3s ease-in-out infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(255, 55, 95, 0.4); }
+  50% { opacity: 0.8; box-shadow: 0 0 40px rgba(255, 55, 95, 0.6); }
+}
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* Status Badges */
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+.status-available {
+  @apply status-badge bg-green-500/10 text-green-400 border border-green-500/20;
+}
+.status-rented {
+  @apply status-badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20;
+}
+.status-pending {
+  @apply status-badge bg-blue-500/10 text-blue-400 border border-blue-500/20;
+}
