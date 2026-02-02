@@ -1,294 +1,372 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '@/contexts/AppContext';
 import { 
-  LayoutDashboard, Users, Globe, Building2, DollarSign, 
-  Settings, LogOut, Search, Filter, MoreHorizontal, ArrowUpRight, Shield
+  ArrowLeft, Users, Globe, DollarSign, TrendingUp, 
+  Settings, Shield, BarChart3, Search, Filter, MoreVertical,
+  CheckCircle2, XCircle, Edit, Trash2, Loader2,
+  Zap, Layers, Briefcase, Star, AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const AdminPanel = () => {
-  const { user, logout, updateUserRole, updateUserTier } = useAppContext();
-  const [activeTab, setActiveTab] = useState('overview');
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  subscription: string;
+  sites: number;
+  revenue: number;
+  joinedAt: string;
+  status: 'active' | 'suspended';
+}
+
+interface SiteData {
+  id: string;
+  name: string;
+  subdomain: string;
+  owner: string;
+  authority: number;
+  traffic: number;
+  status: string;
+  isRented: boolean;
+}
+
+interface RentalData {
+  id: string;
+  siteName: string;
+  clientName: string;
+  monthlyPrice: number;
+  status: string;
+  startedAt: string;
+}
+
+export default function AdminPanel() {
+  const { user } = useAppContext();
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'sites' | 'rentals' | 'settings'>('overview');
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [sites, setSites] = useState<SiteData[]>([]);
+  const [rentals, setRentals] = useState<RentalData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const stats = [
-    { label: 'Total Users', value: '2,847', change: '+12%', icon: Users },
-    { label: 'Active Sites', value: '4,521', change: '+8%', icon: Globe },
-    { label: 'Monthly Revenue', value: '$45,280', change: '+24%', icon: DollarSign },
-    { label: 'Active Rentals', value: '892', change: '+18%', icon: Building2 },
-  ];
+  useEffect(() => {
+    setTimeout(() => {
+      setUsers([
+        { id: '1', name: 'John Doe', email: 'john@example.com', role: 'builder', subscription: 'pro', sites: 12, revenue: 3450, joinedAt: '2025-01-01', status: 'active' },
+        { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'renter', subscription: 'pro', sites: 0, revenue: 0, joinedAt: '2025-01-05', status: 'active' },
+        { id: '3', name: 'Bob Wilson', email: 'bob@example.com', role: 'freelancer', subscription: 'free', sites: 0, revenue: 890, joinedAt: '2025-01-10', status: 'active' },
+        { id: '4', name: 'Alice Brown', email: 'alice@example.com', role: 'builder', subscription: 'enterprise', sites: 28, revenue: 8900, joinedAt: '2024-12-15', status: 'active' },
+      ]);
 
-  const users = [
-    { id: '1', name: 'John Smith', email: 'john@example.com', role: 'builder', tier: 'pro', sites: 5, joined: '2 hours ago', status: 'active' },
-    { id: '2', name: 'Sarah Chen', email: 'sarah@agency.com', role: 'freelancer', tier: 'enterprise', sites: 8, joined: '5 hours ago', status: 'active' },
-    { id: '3', name: 'Mike Johnson', email: 'mike@seo.com', role: 'renter', tier: 'free', sites: 0, joined: '1 day ago', status: 'pending' },
-    { id: '4', name: 'Emily Davis', email: 'emily@legal.com', role: 'employer', tier: 'pro', sites: 2, joined: '2 days ago', status: 'active' },
-  ];
+      setSites([
+        { id: '1', name: 'Keto Diet Guide', subdomain: 'keto-diet', owner: 'John Doe', authority: 78, traffic: 2500, status: 'published', isRented: false },
+        { id: '2', name: 'Best Plumber Miami', subdomain: 'plumber-miami', owner: 'John Doe', authority: 85, traffic: 1800, status: 'published', isRented: true },
+        { id: '3', name: 'Austin Dentist Pro', subdomain: 'dentist-austin', owner: 'Alice Brown', authority: 62, traffic: 950, status: 'published', isRented: true },
+      ]);
 
-  const sidebarLinks = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+      setRentals([
+        { id: '1', siteName: 'Best Plumber Miami', clientName: 'Mike\'s Plumbing', monthlyPrice: 199, status: 'active', startedAt: '2025-01-15' },
+        { id: '2', siteName: 'Austin Dentist Pro', clientName: 'Smile Dental', monthlyPrice: 149, status: 'active', startedAt: '2025-01-20' },
+      ]);
+
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  const stats = {
+    totalUsers: users.length,
+    totalSites: sites.length,
+    totalRentals: rentals.length,
+    monthlyRevenue: rentals.reduce((acc, r) => acc + r.monthlyPrice, 0),
+    totalTraffic: sites.reduce((acc, s) => acc + s.traffic, 0),
+  };
+
+  const filteredUsers = users.filter(u => 
+    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSuspendUser = (userId: string) => {
+    setUsers(users.map(u => u.id === userId ? { ...u, status: u.status === 'active' ? 'suspended' : 'active' } : u));
+    toast.success('User status updated');
+  };
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'sites', label: 'Sites', icon: Globe },
-    { id: 'rentals', label: 'Rentals', icon: Building2 },
+    { id: 'rentals', label: 'Rentals', icon: DollarSign },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    await updateUserRole(userId, newRole as any);
-    toast.success('User role updated');
-  };
-
-  const handleTierChange = async (userId: string, newTier: string) => {
-    await updateUserTier(userId, newTier as any);
-    toast.success('User tier updated');
-  };
-
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#0d0d12] border-r border-white/5 flex-shrink-0 hidden lg:flex flex-col">
-        <div className="p-6">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center gap-4">
+            <Link to="/dashboard" className="p-2 rounded-lg bg-white/5 text-white/60 hover:bg-white/10">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
             <div>
-              <span className="text-lg font-bold text-white">Admin</span>
-              <span className="text-xs text-[#ff375f] block">Super Admin</span>
-            </div>
-          </Link>
-        </div>
-
-        <nav className="flex-1 px-4 space-y-1">
-          {sidebarLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => setActiveTab(link.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-                activeTab === link.id
-                  ? 'bg-[#ff375f]/10 text-[#ff375f]'
-                  : 'text-white/60 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              <link.icon className="w-5 h-5" />
-              {link.label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-white/5">
-          <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <LogOut className="w-5 h-5" /> Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-white capitalize">{activeTab}</h1>
-              <p className="text-sm text-white/50">Super Admin Dashboard</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm text-white">{user?.fullName}</p>
-                <p className="text-xs text-[#ff375f]">{user?.email}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center text-white font-bold">
-                {user?.fullName?.charAt(0)}
-              </div>
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <Shield className="w-6 h-6 text-[#ff375f]" />
+                Admin Panel
+              </h1>
+              <p className="text-sm text-white/50">Platform management</p>
             </div>
           </div>
-        </header>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#ff375f]/20 text-[#ff375f]">
+            <Star className="w-4 h-4" />
+            <span className="text-sm font-medium">Super Admin</span>
+          </div>
+        </div>
+      </header>
 
-        <div className="p-6">
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
-              {/* Stats */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {stats.map((stat, i) => (
-                  <div key={i} className="glass-card p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <stat.icon className="w-5 h-5 text-[#ff375f]" />
-                      <span className="text-xs text-green-400 flex items-center gap-1">
-                        <ArrowUpRight className="w-3 h-3" /> {stat.change}
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold text-white">{stat.value}</p>
-                    <p className="text-sm text-white/50">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all ${
+                activeTab === tab.id
+                  ? 'bg-[#ff375f] text-white'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-              {/* Charts */}
-              <div className="grid lg:grid-cols-2 gap-6">
-                <div className="glass-card p-6">
-                  <h3 className="font-semibold text-white mb-4">Revenue Trend</h3>
-                  <div className="h-48 flex items-end gap-2">
-                    {[35, 45, 40, 55, 50, 65, 70, 75, 85, 90, 95, 100].map((h, i) => (
-                      <div key={i} className="flex-1 bg-gradient-to-t from-[#ff375f] to-[#ff6b35] rounded-t opacity-80" style={{ height: `${h}%` }} />
-                    ))}
-                  </div>
+        {activeTab === 'overview' && (
+          <div>
+            {/* Stats Grid */}
+            <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+              {[
+                { label: 'Total Users', value: stats.totalUsers, icon: Users, color: 'text-blue-400' },
+                { label: 'Total Sites', value: stats.totalSites, icon: Globe, color: 'text-green-400' },
+                { label: 'Active Rentals', value: stats.totalRentals, icon: DollarSign, color: 'text-purple-400' },
+                { label: 'Monthly Revenue', value: `$${stats.monthlyRevenue}`, icon: TrendingUp, color: 'text-yellow-400' },
+                { label: 'Total Traffic', value: stats.totalTraffic.toLocaleString(), icon: Zap, color: 'text-cyan-400' },
+              ].map((stat, i) => (
+                <div key={i} className="glass-card p-5">
+                  <stat.icon className={`w-6 h-6 ${stat.color} mb-2`} />
+                  <div className="text-2xl font-bold text-white">{stat.value}</div>
+                  <div className="text-white/50 text-sm">{stat.label}</div>
                 </div>
-                <div className="glass-card p-6">
-                  <h3 className="font-semibold text-white mb-4">User Growth</h3>
-                  <div className="h-48 flex items-end gap-2">
-                    {[20, 25, 30, 35, 40, 48, 55, 62, 70, 78, 85, 92].map((h, i) => (
-                      <div key={i} className="flex-1 bg-white/10 rounded-t" style={{ height: `${h}%` }} />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Recent Activity */}
+            {/* Recent Activity */}
+            <div className="grid lg:grid-cols-2 gap-6">
               <div className="glass-card p-6">
-                <h3 className="font-semibold text-white mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Top Builders</h3>
                 <div className="space-y-3">
-                  {[
-                    { action: 'New user registered', detail: 'pro@agency.com', time: '2 min ago' },
-                    { action: 'Site published', detail: 'luxury-homes-seattle.seoflood.ai', time: '5 min ago' },
-                    { action: 'Rental created', detail: '$720/mo - Seattle Luxury Homes', time: '12 min ago' },
-                    { action: 'Payment received', detail: '$29 - Pro plan upgrade', time: '15 min ago' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                      <div>
-                        <p className="text-sm text-white">{item.action}</p>
-                        <p className="text-xs text-white/40">{item.detail}</p>
+                  {users.filter(u => u.role === 'builder').sort((a, b) => b.revenue - a.revenue).slice(0, 5).map((user, i) => (
+                    <div key={user.id} className="flex items-center gap-4 p-3 rounded-xl bg-white/5">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center text-white font-bold">
+                        {i + 1}
                       </div>
-                      <span className="text-xs text-white/30">{item.time}</span>
+                      <div className="flex-1">
+                        <div className="text-white font-medium">{user.name}</div>
+                        <div className="text-white/50 text-sm">{user.sites} sites</div>
+                      </div>
+                      <div className="text-green-400 font-medium">${user.revenue}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Top Sites by Traffic</h3>
+                <div className="space-y-3">
+                  {sites.sort((a, b) => b.traffic - a.traffic).slice(0, 5).map((site, i) => (
+                    <div key={site.id} className="flex items-center gap-4 p-3 rounded-xl bg-white/5">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
+                        {i + 1}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-medium">{site.name}</div>
+                        <div className="text-white/50 text-sm">{site.owner}</div>
+                      </div>
+                      <div className="text-blue-400 font-medium">{site.traffic.toLocaleString()}</div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {activeTab === 'users' && (
-            <div className="glass-card overflow-hidden">
-              <div className="p-4 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-                    <input
-                      type="text"
-                      placeholder="Search users..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ff375f]/50"
-                    />
-                  </div>
-                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 text-white/60 text-sm">
-                    <Filter className="w-4 h-4" /> Filter
-                  </button>
-                </div>
+        {activeTab === 'users' && (
+          <div>
+            <div className="flex gap-4 mb-6">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search users..."
+                  className="input-holographic pl-12 w-full"
+                />
               </div>
+            </div>
+
+            <div className="glass-card overflow-hidden">
               <table className="w-full">
                 <thead className="bg-white/5">
                   <tr>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-white/60">User</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-white/60">Role</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-white/60">Plan</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-white/60">Sites</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-white/60">Status</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-white/60">Actions</th>
+                    <th className="text-left p-4 text-white/60 font-medium">User</th>
+                    <th className="text-left p-4 text-white/60 font-medium">Role</th>
+                    <th className="text-left p-4 text-white/60 font-medium">Plan</th>
+                    <th className="text-left p-4 text-white/60 font-medium">Sites</th>
+                    <th className="text-left p-4 text-white/60 font-medium">Revenue</th>
+                    <th className="text-left p-4 text-white/60 font-medium">Status</th>
+                    <th className="text-left p-4 text-white/60 font-medium">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {users.filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase())).map((user) => (
-                    <tr key={user.id} className="border-b border-white/5 last:border-0">
-                      <td className="px-4 py-3">
+                <tbody className="divide-y divide-white/5">
+                  {filteredUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-white/5">
+                      <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center text-white text-sm font-bold">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center text-white font-bold">
                             {user.name.charAt(0)}
                           </div>
                           <div>
-                            <p className="text-sm text-white">{user.name}</p>
-                            <p className="text-xs text-white/40">{user.email}</p>
+                            <div className="text-white font-medium">{user.name}</div>
+                            <div className="text-white/50 text-sm">{user.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <select 
-                          value={user.role}
-                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                          className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white"
-                        >
-                          <option value="user">User</option>
-                          <option value="builder">Builder</option>
-                          <option value="renter">Renter</option>
-                          <option value="freelancer">Freelancer</option>
-                          <option value="employer">Employer</option>
-                          <option value="admin">Admin</option>
-                        </select>
+                      <td className="p-4">
+                        <span className="px-2 py-1 rounded-full bg-white/10 text-xs text-white/60 capitalize">
+                          {user.role}
+                        </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <select 
-                          value={user.tier}
-                          onChange={(e) => handleTierChange(user.id, e.target.value)}
-                          className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white"
-                        >
-                          <option value="free">Free</option>
-                          <option value="pro">Pro</option>
-                          <option value="enterprise">Enterprise</option>
-                        </select>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded-full text-xs capitalize ${
+                          user.subscription === 'enterprise' ? 'bg-purple-500/20 text-purple-400' :
+                          user.subscription === 'pro' ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-white/10 text-white/60'
+                        }`}>
+                          {user.subscription}
+                        </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-white/60">{user.sites}</td>
-                      <td className="px-4 py-3">
+                      <td className="p-4 text-white">{user.sites}</td>
+                      <td className="p-4 text-green-400">${user.revenue}</td>
+                      <td className="p-4">
                         <span className={`px-2 py-1 rounded-full text-xs ${
-                          user.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'
+                          user.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                         }`}>
                           {user.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <button className="p-2 rounded-lg hover:bg-white/5 text-white/40 hover:text-white">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => handleSuspendUser(user.id)}
+                            className="p-2 rounded-lg bg-white/5 text-white/60 hover:text-white"
+                            title={user.status === 'active' ? 'Suspend' : 'Activate'}
+                          >
+                            {user.status === 'active' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                          </button>
+                          <button className="p-2 rounded-lg bg-white/5 text-white/60 hover:text-white">
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
+          </div>
+        )}
 
-          {activeTab === 'settings' && (
-            <div className="glass-card p-6 space-y-6">
-              <h3 className="font-semibold text-white">Platform Settings</h3>
+        {activeTab === 'sites' && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sites.map((site) => (
+              <div key={site.id} className="glass-card p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-white font-semibold">{site.name}</h3>
+                    <p className="text-sm text-white/50">{site.subdomain}.seofloodai.com</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    site.isRented ? 'bg-purple-500/20 text-purple-400' : 'bg-green-500/20 text-green-400'
+                  }`}>
+                    {site.isRented ? 'Rented' : 'Available'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <div className="text-white font-medium">{site.authority}</div>
+                    <div className="text-xs text-white/50">Authority</div>
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">{site.traffic.toLocaleString()}</div>
+                    <div className="text-xs text-white/50">Traffic</div>
+                  </div>
+                </div>
+                <div className="text-sm text-white/50">Owner: {site.owner}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'rentals' && (
+          <div className="space-y-4">
+            {rentals.map((rental) => (
+              <div key={rental.id} className="glass-card p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-white font-semibold">{rental.siteName}</h3>
+                    <p className="text-white/50">Client: {rental.clientName}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-white font-semibold">${rental.monthlyPrice}/mo</div>
+                    <div className="text-sm text-white/50">Since {rental.startedAt}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="space-y-6">
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Platform Settings</h3>
               <div className="space-y-4">
                 {[
-                  { label: 'Maintenance Mode', desc: 'Disable all user access', enabled: false },
-                  { label: 'New Registrations', desc: 'Allow new user signups', enabled: true },
-                  { label: 'Rental Marketplace', desc: 'Enable site rentals', enabled: true },
-                  { label: 'AI Content Generation', desc: 'Enable AI writing features', enabled: true },
-                  { label: 'Mass Page Generator', desc: 'Enable bulk page generation', enabled: true },
-                  { label: 'Social Marketing', desc: 'Enable social media tools', enabled: true },
+                  { label: 'New Registrations', desc: 'Allow new users to sign up', enabled: true },
+                  { label: 'Rental Marketplace', desc: 'Enable site rental features', enabled: true },
+                  { label: 'AI Content Generation', desc: 'Allow AI-powered content creation', enabled: true },
+                  { label: 'Maintenance Mode', desc: 'Put site in maintenance mode', enabled: false },
                 ].map((setting, i) => (
-                  <div key={i} className="flex items-center justify-between py-3 border-b border-white/5">
+                  <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/5">
                     <div>
-                      <p className="text-white">{setting.label}</p>
-                      <p className="text-xs text-white/40">{setting.desc}</p>
+                      <div className="text-white font-medium">{setting.label}</div>
+                      <div className="text-white/50 text-sm">{setting.desc}</div>
                     </div>
-                    <button className={`w-12 h-6 rounded-full relative transition-colors ${
-                      setting.enabled ? 'bg-[#ff375f]' : 'bg-white/10'
-                    }`}>
-                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${
-                        setting.enabled ? 'left-7' : 'left-1'
-                      }`} />
-                    </button>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" defaultChecked={setting.enabled} className="sr-only peer" />
+                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ff375f]"></div>
+                    </label>
                   </div>
                 ))}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );
-};
-
-export default AdminPanel;
+}

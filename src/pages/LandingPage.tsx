@@ -1,314 +1,468 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  ArrowRight, Play, Sparkles, Globe, TrendingUp, Users, 
-  Wand2, Building2, Briefcase, Check, Star, Menu, X
+  Rocket, Globe, Zap, TrendingUp, Users, DollarSign, 
+  Shield, Sparkles, ArrowRight, CheckCircle2, Star,
+  BarChart3, Target, Layers, Play, ChevronRight
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1920&h=1080&fit=crop';
+const features = [
+  {
+    icon: Globe,
+    title: 'Mass Page Generation',
+    description: 'Generate hundreds of SEO-optimized pages targeting long-tail keywords in minutes.',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Instant Rankings',
+    description: 'Rank #1 for local keywords and rent those positions to businesses.',
+  },
+  {
+    icon: Zap,
+    title: 'AI-Powered Creation',
+    description: 'Free AI agents powered by Puter.js create stunning websites and content.',
+  },
+  {
+    icon: Layers,
+    title: 'Website Overlay',
+    description: 'Overlay client websites on your ranked pages for instant traffic.',
+  },
+  {
+    icon: Target,
+    title: 'Campaign Manager',
+    description: 'Complete marketing campaign creation with Blaze.ai-style automation.',
+  },
+  {
+    icon: Users,
+    title: 'Job Marketplace',
+    description: 'Connect with freelancers and agencies for your projects.',
+  },
+];
 
-const LandingPage = () => {
-  const [typedText, setTypedText] = useState('');
-  const [showCursor, setShowCursor] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const fullText = 'Build. Rank. Rent. Profit.';
+const pricingTiers = [
+  {
+    name: 'Free',
+    price: '$0',
+    period: '/month',
+    description: 'Get started with basic features',
+    features: [
+      '3 sites maximum',
+      '5 AI tasks per day',
+      'Browse marketplace',
+      'Basic support',
+    ],
+    cta: 'Get Started Free',
+    highlighted: false,
+  },
+  {
+    name: 'Pro',
+    price: '$29',
+    period: '/month',
+    description: 'Perfect for serious builders',
+    features: [
+      '25 sites maximum',
+      '100 AI tasks per day',
+      'Full marketplace access',
+      'Priority support',
+      'Custom domains',
+      'Advanced analytics',
+    ],
+    cta: 'Start Pro Trial',
+    highlighted: true,
+  },
+  {
+    name: 'Enterprise',
+    price: '$99',
+    period: '/month',
+    description: 'For agencies and power users',
+    features: [
+      'Unlimited sites',
+      'Unlimited AI tasks',
+      'Priority placement',
+      'White-label options',
+      'API access',
+      'Dedicated account manager',
+    ],
+    cta: 'Contact Sales',
+    highlighted: false,
+  },
+];
 
-  useEffect(() => {
-    let index = 0;
-    const typeInterval = setInterval(() => {
-      if (index <= fullText.length) {
-        setTypedText(fullText.slice(0, index));
-        index++;
-      } else {
-        clearInterval(typeInterval);
-      }
-    }, 80);
+const testimonials = [
+  {
+    name: 'Michael Chen',
+    role: 'SEO Agency Owner',
+    content: 'SEO Flood AI transformed my business. I went from struggling to rank clients to having 50+ ranked pages generating passive income.',
+    rating: 5,
+  },
+  {
+    name: 'Sarah Johnson',
+    role: 'Local Business Owner',
+    content: 'I was ranking #87 on Google. Within 2 days of renting a page, I was #1. My phone hasnt stopped ringing since.',
+    rating: 5,
+  },
+  {
+    name: 'David Park',
+    role: 'Freelance Developer',
+    content: 'The AI website builder is incredible. I can create professional sites in minutes that would have taken days before.',
+    rating: 5,
+  },
+];
 
-    const cursorInterval = setInterval(() => {
-      setShowCursor(prev => !prev);
-    }, 500);
+const stats = [
+  { value: '10,000+', label: 'Sites Created' },
+  { value: '$2.5M+', label: 'Revenue Generated' },
+  { value: '50,000+', label: 'Pages Ranked' },
+  { value: '98%', label: 'Client Satisfaction' },
+];
 
-    return () => {
-      clearInterval(typeInterval);
-      clearInterval(cursorInterval);
-    };
-  }, []);
-
-  const stats = [
-    { icon: Globe, value: '10K+', label: 'Sites Built' },
-    { icon: TrendingUp, value: '$2.5M', label: 'Rental Revenue' },
-    { icon: Users, value: '50K+', label: 'Active Users' }
-  ];
-
-  const features = [
-    {
-      icon: Wand2,
-      title: 'AI Website Builder',
-      description: 'Generate complete SEO-optimized websites with AI. Voice commands enabled with Flood assistant.',
-      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop'
-    },
-    {
-      icon: Building2,
-      title: 'Authority Rental',
-      description: 'Rent high-authority sites and skip the SEO wait. Get instant visibility in your niche.',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop'
-    },
-    {
-      icon: Briefcase,
-      title: 'Job Marketplace',
-      description: 'Connect with top SEO professionals. Post jobs or find projects that match your skills.',
-      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop'
-    }
-  ];
-
-  const pricingPlans = [
-    {
-      name: 'Starter',
-      price: 'Free',
-      period: '',
-      features: ['3 AI-generated pages', 'Basic SEO tools', 'Community support', 'Flood Score tracking'],
-      cta: 'Start Free',
-      highlighted: false
-    },
-    {
-      name: 'Pro',
-      price: '$29',
-      period: '/month',
-      features: ['Unlimited AI pages', 'Full SEO suite', 'Priority support', 'Rental marketplace', 'API access'],
-      cta: 'Start Pro Trial',
-      highlighted: true
-    },
-    {
-      name: 'Enterprise',
-      price: '$99',
-      period: '/month',
-      features: ['Everything in Pro', 'White-label options', 'Dedicated support', 'Custom integrations', 'Team collaboration'],
-      cta: 'Contact Sales',
-      highlighted: false
-    }
-  ];
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[#0a0a0f] overflow-x-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
-                <span className="text-white font-bold">F</span>
-              </div>
-              <span className="text-lg font-bold text-white">SEOFlood.AI</span>
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              <Link to="/rental" className="text-sm text-white/60 hover:text-white transition-colors">Authority Rental</Link>
-              <Link to="/marketplace" className="text-sm text-white/60 hover:text-white transition-colors">Job Marketplace</Link>
-              <Link to="/login" className="text-sm text-white/60 hover:text-white transition-colors">Sign In</Link>
-              <Link to="/signup" className="btn-primary text-sm py-2 px-4">Get Started</Link>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
+              <Rocket className="w-5 h-5 text-white" />
             </div>
-
-            <button className="md:hidden p-2 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            <span className="text-xl font-bold text-white">SEO Flood AI</span>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-white/60 hover:text-white transition-colors">Features</a>
+            <a href="#pricing" className="text-white/60 hover:text-white transition-colors">Pricing</a>
+            <a href="#testimonials" className="text-white/60 hover:text-white transition-colors">Testimonials</a>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-white/60 hover:text-white transition-colors">Sign In</Link>
+            <Link to="/signup" className="btn-primary">Get Started</Link>
           </div>
         </div>
-
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-[#0a0a0f] border-t border-white/5 p-4">
-            <Link to="/rental" className="block py-2 text-white/60">Authority Rental</Link>
-            <Link to="/marketplace" className="block py-2 text-white/60">Job Marketplace</Link>
-            <Link to="/login" className="block py-2 text-white/60">Sign In</Link>
-            <Link to="/signup" className="block py-2 text-[#ff375f]">Get Started</Link>
-          </div>
-        )}
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0a0a0f]/80 to-[#0a0a0f]" />
-          <div className="absolute inset-0 circuit-pattern opacity-30" />
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#ff375f]/20 rounded-full blur-[128px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#ff6b35]/20 rounded-full blur-[128px]" />
         </div>
 
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#ff375f]/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#ff6b35]/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
+        <div className="relative max-w-7xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
               <Sparkles className="w-4 h-4 text-[#ff375f]" />
-              <span className="text-sm text-white/80">AI-Powered SEO Platform</span>
+              <span className="text-sm text-white/80">Now with free AI agents powered by Puter.js</span>
             </div>
-
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-              <span className="text-white">The Future of</span>
-              <br />
-              <span className="gradient-text text-glow">SEO is Here</span>
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+              Rank #1 on Google{' '}
+              <span className="text-gradient">In Days, Not Months</span>
             </h1>
-
-            <div className="h-12 flex items-center justify-center mb-6">
-              <span className="text-2xl md:text-3xl font-semibold text-white/90">
-                {typedText}
-                <span className={`ml-1 ${showCursor ? 'opacity-100' : 'opacity-0'}`}>|</span>
-              </span>
-            </div>
-
-            <p className="text-lg text-white/60 max-w-2xl mx-auto mb-10">
-              Create stunning AI-powered websites, monetize through our revolutionary 
-              Rank & Rent authority system, and connect with top talent in our integrated 
-              marketplace.
+            
+            <p className="text-xl text-white/60 mb-8 max-w-2xl mx-auto">
+              Generate hundreds of SEO-optimized pages, rank for local keywords, 
+              and rent those positions to businesses desperate for traffic.
             </p>
-
-            <div className="flex flex-wrap justify-center gap-4 mb-16">
-              <Link to="/signup" className="group btn-primary flex items-center gap-2">
-                Start Building Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/signup" className="btn-primary text-lg px-8 py-4 flex items-center gap-2">
+                Start Building Free <ArrowRight className="w-5 h-5" />
               </Link>
-              <button className="btn-secondary flex items-center gap-2">
-                <Play className="w-5 h-5" />
-                Watch Demo
+              <button className="btn-secondary text-lg px-8 py-4 flex items-center gap-2">
+                <Play className="w-5 h-5" /> Watch Demo
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
-              {stats.map((stat, idx) => (
-                <div key={idx} className="text-center">
-                  <stat.icon className="w-6 h-6 text-[#ff375f] mx-auto mb-2" />
-                  <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+              {stats.map((stat, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-3xl md:text-4xl font-bold text-gradient">{stat.value}</div>
                   <div className="text-sm text-white/50">{stat.label}</div>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 relative">
-        <div className="absolute inset-0 circuit-pattern opacity-10" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Everything You Need to <span className="gradient-text">Dominate Search</span>
-            </h2>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
-              Build, rank, and rent—all in one powerful platform designed for serious SEO professionals.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, idx) => (
-              <div key={idx} className="glass-card rounded-2xl overflow-hidden group hover:border-[#ff375f]/30 transition-all">
-                <div className="aspect-video overflow-hidden">
-                  <img src={feature.image} alt={feature.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                </div>
-                <div className="p-6">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff375f]/20 to-[#ff6b35]/20 flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-[#ff375f]" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-white/60">{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-24 bg-white/[0.02]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">How It Works</h2>
-            <p className="text-lg text-white/60">Four simple steps to SEO success</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How It Works</h2>
+            <p className="text-white/60 max-w-2xl mx-auto">
+              Our proven 4-step process takes you from idea to ranked pages generating income.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '01', title: 'Build Your Site', desc: 'Use AI to create a complete, SEO-optimized website in minutes.' },
-              { step: '02', title: 'Climb Rankings', desc: 'Track your Flood Score and follow AI recommendations.' },
-              { step: '03', title: 'Rent or Scale', desc: 'List your high-ranking site for rent or scale with more properties.' },
-              { step: '04', title: 'Profit', desc: 'Earn passive income from rentals while your authority grows.' }
-            ].map((item, idx) => (
-              <div key={idx} className="relative">
-                <span className="text-6xl font-bold text-[#ff375f]/20">{item.step}</span>
-                <h3 className="text-xl font-semibold text-white mt-4 mb-2">{item.title}</h3>
-                <p className="text-white/50">{item.desc}</p>
-              </div>
+              { step: '01', title: 'Create Main Site', desc: 'Build your keyword-targeted main page with our AI' },
+              { step: '02', title: 'Generate Pages', desc: 'Mass-create supporting pages targeting long-tail keywords' },
+              { step: '03', title: 'Rank & Drive Traffic', desc: 'All pages redirect traffic to your main ranked page' },
+              { step: '04', title: 'Rent & Profit', desc: 'Overlay client websites and collect monthly rent' },
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="relative"
+              >
+                <div className="glass-card p-6 h-full">
+                  <div className="text-4xl font-bold text-gradient mb-4">{item.step}</div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+                  <p className="text-white/60">{item.desc}</p>
+                </div>
+                {i < 3 && (
+                  <ChevronRight className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 text-white/20" />
+                )}
+              </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="py-20 px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Everything You Need to Dominate SEO
+            </h2>
+            <p className="text-white/60 max-w-2xl mx-auto">
+              A complete toolkit for building, ranking, and monetizing websites at scale.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card-hover p-6"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff375f]/20 to-[#ff6b35]/20 flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-[#ff375f]" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                <p className="text-white/60">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Agents Section */}
+      <section className="py-20 px-6 border-t border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ff375f]/10 rounded-full blur-[200px]" />
+        
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff375f]/10 border border-[#ff375f]/20 mb-6">
+                <Zap className="w-4 h-4 text-[#ff375f]" />
+                <span className="text-sm text-[#ff375f]">Powered by Puter.js</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Free AI Agents for Everything
+              </h2>
+              <p className="text-white/60 mb-6">
+                Create websites, generate content, design images, and more—all for free 
+                with our Puter.js integration. No API keys needed.
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  'Website generation with stunning designs',
+                  'SEO-optimized content creation',
+                  'Image generation for any purpose',
+                  'Video scripts and marketing copy',
+                  'Keyword research and analysis',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <span className="text-white/80">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="glass-card p-6">
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/10">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="ml-4 text-sm text-white/40">AI Agent Console</span>
+              </div>
+              <div className="font-mono text-sm space-y-2">
+                <div className="text-green-400">$ nexus-agent create-website</div>
+                <div className="text-white/60">Analyzing requirements...</div>
+                <div className="text-white/60">Generating design...</div>
+                <div className="text-[#ff375f]">✓ Website created successfully!</div>
+                <div className="text-white/40 mt-4">$ _</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Pricing */}
-      <section className="py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="pricing" className="py-20 px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-lg text-white/60">Start free, upgrade when you're ready to scale.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-white/60 max-w-2xl mx-auto">
+              Start free and scale as you grow. No hidden fees.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, idx) => (
-              <div key={idx} className={`glass-card rounded-2xl p-8 ${plan.highlighted ? 'neon-border relative scale-105' : ''}`}>
-                {plan.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#ff375f] text-white text-sm font-medium">
-                      <Star className="w-4 h-4" />
-                      Most Popular
-                    </span>
+            {pricingTiers.map((tier, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className={`glass-card p-8 ${tier.highlighted ? 'border-[#ff375f]/50 ring-2 ring-[#ff375f]/20' : ''}`}
+              >
+                {tier.highlighted && (
+                  <div className="inline-block px-3 py-1 rounded-full bg-[#ff375f]/20 text-[#ff375f] text-sm font-medium mb-4">
+                    Most Popular
                   </div>
                 )}
-
-                <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-white">{plan.price}</span>
-                  <span className="text-white/50">{plan.period}</span>
+                <h3 className="text-xl font-semibold text-white mb-2">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-bold text-white">{tier.price}</span>
+                  <span className="text-white/50">{tier.period}</span>
                 </div>
-
+                <p className="text-white/60 mb-6">{tier.description}</p>
+                
                 <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-white/70">
-                      <Check className="w-5 h-5 text-[#ff375f]" />
-                      {feature}
+                  {tier.features.map((feature, fi) => (
+                    <li key={fi} className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span className="text-white/80">{feature}</span>
                     </li>
                   ))}
                 </ul>
-
-                <Link to="/signup" className={`block w-full text-center py-3 rounded-xl font-medium transition-all ${
-                  plan.highlighted ? 'btn-primary' : 'btn-secondary'
-                }`}>
-                  {plan.cta}
+                
+                <Link 
+                  to="/signup" 
+                  className={`block text-center py-3 rounded-xl font-medium transition-all ${
+                    tier.highlighted 
+                      ? 'btn-primary' 
+                      : 'bg-white/10 text-white hover:bg-white/15'
+                  }`}
+                >
+                  {tier.cta}
                 </Link>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
-                <Globe className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white">SEOFlood.AI</span>
+      {/* Testimonials */}
+      <section id="testimonials" className="py-20 px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Loved by SEO Professionals
+            </h2>
+            <p className="text-white/60 max-w-2xl mx-auto">
+              See what our users are saying about SEO Flood AI.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card p-6"
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, ri) => (
+                    <Star key={ri} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-white/80 mb-6">"{testimonial.content}"</p>
+                <div>
+                  <div className="font-semibold text-white">{testimonial.name}</div>
+                  <div className="text-sm text-white/50">{testimonial.role}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="glass-card p-12 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#ff375f]/10 to-[#ff6b35]/10" />
+            <div className="relative">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Ready to Flood Google with Your Pages?
+              </h2>
+              <p className="text-white/60 mb-8 max-w-xl mx-auto">
+                Join thousands of SEO professionals who are ranking #1 and 
+                generating passive income with SEO Flood AI.
+              </p>
+              <Link to="/signup" className="btn-primary text-lg px-8 py-4 inline-flex items-center gap-2">
+                Get Started Free <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
-            <nav className="flex items-center gap-6">
-              <Link to="/rental" className="text-sm text-white/50 hover:text-white">Authority Rental</Link>
-              <Link to="/marketplace" className="text-sm text-white/50 hover:text-white">Job Marketplace</Link>
-              <Link to="/login" className="text-sm text-white/50 hover:text-white">Sign In</Link>
-            </nav>
-            <p className="text-sm text-white/30">© 2024 SEOFlood.AI</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
+                <Rocket className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-bold text-white">SEO Flood AI</span>
+            </div>
+            <div className="flex items-center gap-8">
+              <a href="#" className="text-white/50 hover:text-white transition-colors">Privacy</a>
+              <a href="#" className="text-white/50 hover:text-white transition-colors">Terms</a>
+              <a href="#" className="text-white/50 hover:text-white transition-colors">Support</a>
+            </div>
+            <div className="text-white/40 text-sm">
+              © 2025 SEO Flood AI. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
     </div>
   );
-};
-
-export default LandingPage;
+}

@@ -1,218 +1,344 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '@/contexts/AppContext';
 import { 
-  LayoutDashboard, Globe, TrendingUp, Building2, Users, 
-  Settings, LogOut, Plus, ArrowUpRight, Bell, Sparkles,
-  Wand2, Bot, Share2, BarChart3
+  Rocket, LayoutDashboard, Globe, Zap, TrendingUp, 
+  Users, DollarSign, Settings, LogOut, Plus, ExternalLink,
+  BarChart3, Target, Layers, Briefcase, Sparkles,
+  ChevronRight, Star, ArrowUpRight, AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
-const Dashboard = () => {
-  const { user, logout } = useAppContext();
+interface DashboardStats {
+  totalSites: number;
+  publishedSites: number;
+  totalPages: number;
+  totalRentals: number;
+  monthlyRevenue: number;
+  authorityScore: number;
+}
 
-  const stats = [
-    { label: 'Flood Score', value: user?.authorityScore || 0, change: '+12', icon: Sparkles, color: 'text-[#ff375f]' },
-    { label: 'Active Sites', value: '5', change: '+2', icon: Globe, color: 'text-blue-400' },
-    { label: 'Total Clicks', value: '12.4K', change: '+24%', icon: TrendingUp, color: 'text-green-400' },
-    { label: 'Rental Income', value: '$2,840', change: '+18%', icon: Building2, color: 'text-yellow-400' },
-  ];
+interface RecentActivity {
+  id: string;
+  type: 'site_created' | 'page_generated' | 'rental_started' | 'payment_received';
+  title: string;
+  timestamp: string;
+}
+
+const navItems = [
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/sites', label: 'My Sites', icon: Globe },
+  { path: '/mass-generator', label: 'Mass Generator', icon: Zap },
+  { path: '/overlays', label: 'Overlays', icon: Layers },
+  { path: '/campaigns', label: 'Campaigns', icon: Target },
+  { path: '/marketplace', label: 'Marketplace', icon: Briefcase },
+  { path: '/ai-agents', label: 'AI Agents', icon: Sparkles },
+  { path: '/profile', label: 'Profile', icon: Users },
+  { path: '/settings', label: 'Settings', icon: Settings },
+];
+
+export default function Dashboard() {
+  const { user, logout, hasPermission } = useAppContext();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalSites: 0,
+    publishedSites: 0,
+    totalPages: 0,
+    totalRentals: 0,
+    monthlyRevenue: 0,
+    authorityScore: user?.authority_score || 0,
+  });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading dashboard data
+    const loadData = async () => {
+      setIsLoading(true);
+      
+      // Mock data for demo
+      setTimeout(() => {
+        setStats({
+          totalSites: 12,
+          publishedSites: 8,
+          totalPages: 347,
+          totalRentals: 5,
+          monthlyRevenue: 2450,
+          authorityScore: user?.authority_score || 78,
+        });
+
+        setRecentActivity([
+          { id: '1', type: 'page_generated', title: 'Generated 50 pages for "plumber-miami"', timestamp: '2 hours ago' },
+          { id: '2', type: 'rental_started', title: 'New rental: keto-diet site', timestamp: '5 hours ago' },
+          { id: '3', type: 'site_created', title: 'Created new site: "best-dentist-austin"', timestamp: '1 day ago' },
+          { id: '4', type: 'payment_received', title: 'Payment received: $299 from client', timestamp: '2 days ago' },
+        ]);
+
+        setIsLoading(false);
+      }, 1000);
+    };
+
+    loadData();
+  }, [user?.authority_score]);
 
   const quickActions = [
-    { label: 'Build New Site', desc: 'AI-powered website builder', icon: Wand2, href: '/builder', color: 'from-[#ff375f] to-[#ff6b35]' },
-    { label: 'Manage Agents', desc: 'Configure AI agent tasks', icon: Bot, href: '/agents', color: 'from-purple-500 to-pink-500' },
-    { label: 'Mass Generator', desc: 'Generate 100s of SEO pages', icon: Globe, href: '/mass-generator', color: 'from-blue-500 to-cyan-500' },
-    { label: 'Social Marketing', desc: 'Schedule posts & promotions', icon: Share2, href: '/social', color: 'from-green-500 to-emerald-500' },
+    { 
+      label: 'Create New Site', 
+      icon: Plus, 
+      path: '/sites',
+      color: 'from-[#ff375f] to-[#ff6b35]',
+      description: 'Build a new website with AI'
+    },
+    { 
+      label: 'Generate Pages', 
+      icon: Zap, 
+      path: '/mass-generator',
+      color: 'from-blue-500 to-cyan-500',
+      description: 'Mass-create SEO pages'
+    },
+    { 
+      label: 'Browse Marketplace', 
+      icon: Globe, 
+      path: '/marketplace',
+      color: 'from-green-500 to-emerald-500',
+      description: 'Find sites to rent'
+    },
+    { 
+      label: 'Create Campaign', 
+      icon: Target, 
+      path: '/campaigns',
+      color: 'from-purple-500 to-pink-500',
+      description: 'Launch marketing campaigns'
+    },
   ];
 
-  const recentSites = [
-    { id: 1, name: 'Seattle Luxury Homes', status: 'published', score: 85, traffic: '2.4K' },
-    { id: 2, name: 'Austin Real Estate', status: 'draft', score: 72, traffic: '0' },
-    { id: 3, name: 'Denver CBD Guide', status: 'published', score: 78, traffic: '1.8K' },
+  const statCards = [
+    { label: 'Total Sites', value: stats.totalSites, icon: Globe, color: 'text-blue-400' },
+    { label: 'Pages Generated', value: stats.totalPages, icon: Layers, color: 'text-green-400' },
+    { label: 'Active Rentals', value: stats.totalRentals, icon: Users, color: 'text-purple-400' },
+    { label: 'Monthly Revenue', value: `$${stats.monthlyRevenue}`, icon: DollarSign, color: 'text-yellow-400' },
   ];
-
-  const handleLogout = async () => {
-    await logout();
-    toast.success('Logged out successfully');
-  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0d0d12] border-r border-white/5 flex-shrink-0 hidden lg:flex flex-col">
-        <div className="p-6">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
-              <span className="text-white font-bold">F</span>
-            </div>
-            <span className="text-lg font-bold text-white">SEOFlood</span>
-          </Link>
-        </div>
+      <aside className="w-64 bg-[#0a0a0f] border-r border-white/5 flex flex-col fixed h-full">
+        {/* Logo */}
+        <Link to="/dashboard" className="flex items-center gap-3 p-6 border-b border-white/5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
+            <Rocket className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-lg font-bold text-white">SEO Flood AI</span>
+        </Link>
 
-        <nav className="flex-1 px-4 space-y-1">
-          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#ff375f] bg-[#ff375f]/10">
-            <LayoutDashboard className="w-5 h-5" /> Dashboard
-          </Link>
-          <Link to="/builder" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Wand2 className="w-5 h-5" /> Website Builder
-          </Link>
-          <Link to="/agents" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Bot className="w-5 h-5" /> AI Agents
-          </Link>
-          <Link to="/mass-generator" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Globe className="w-5 h-5" /> Mass Generator
-          </Link>
-          <Link to="/social" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Share2 className="w-5 h-5" /> Social Marketing
-          </Link>
-          <Link to="/rental" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Building2 className="w-5 h-5" /> Authority Rental
-          </Link>
-          <Link to="/marketplace" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Users className="w-5 h-5" /> Job Marketplace
-          </Link>
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                location.pathname === item.path
+                  ? 'bg-[#ff375f]/10 text-[#ff375f] border border-[#ff375f]/20'
+                  : 'text-white/60 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span>{item.label}</span>
+            </Link>
+          ))}
         </nav>
 
-        <div className="p-4 border-t border-white/5 space-y-1">
-          <Link to="/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <Settings className="w-5 h-5" /> Settings
+        {/* User & Logout */}
+        <div className="p-4 border-t border-white/5">
+          <Link to="/profile" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors mb-2">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ff375f] to-[#ff6b35] flex items-center justify-center">
+              <span className="text-white font-semibold">{user?.full_name?.charAt(0) || 'U'}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-white font-medium truncate">{user?.full_name}</div>
+              <div className="text-xs text-white/50 capitalize">{user?.role}</div>
+            </div>
           </Link>
-          {(user?.role === 'admin' || user?.role === 'superadmin') && (
-            <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-              <BarChart3 className="w-5 h-5" /> Admin Panel
-            </Link>
-          )}
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <LogOut className="w-5 h-5" /> Logout
+          <button
+            onClick={logout}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-colors w-full"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 ml-64">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
+        <header className="sticky top-0 z-40 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-white">Dashboard</h1>
-              <p className="text-sm text-white/50">Welcome back, {user?.fullName}</p>
+              <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+              <p className="text-white/50">Welcome back, {user?.full_name?.split(' ')[0]}</p>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="p-3 rounded-xl bg-white/5 text-white/60 hover:bg-white/10 relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff375f] rounded-full" />
-              </button>
-              <Link to="/builder" className="btn-primary flex items-center gap-2 text-sm py-2 px-4">
-                <Plus className="w-4 h-4" /> New Site
-              </Link>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5">
+                <Star className="w-4 h-4 text-yellow-400" />
+                <span className="text-white font-medium">{stats.authorityScore}</span>
+                <span className="text-white/50 text-sm">Authority Score</span>
+              </div>
+              {(user?.role === 'admin' || user?.role === 'superadmin') && (
+                <Link to="/admin" className="btn-secondary text-sm flex items-center gap-2">
+                  <Settings className="w-4 h-4" /> Admin Panel
+                </Link>
+              )}
             </div>
           </div>
         </header>
 
-        <div className="p-6 space-y-6">
-          {/* Stats Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map((stat, i) => (
-              <div key={i} className="glass-card p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                  <span className={`text-xs flex items-center gap-1 ${stat.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
-                    <ArrowUpRight className="w-3 h-3" /> {stat.change}
-                  </span>
-                </div>
-                <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-sm text-white/50">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
+        {/* Dashboard Content */}
+        <div className="p-8">
           {/* Quick Actions */}
-          <div>
+          <section className="mb-8">
             <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {quickActions.map((action, i) => (
-                <Link
+                <motion.div
                   key={i}
-                  to={action.href}
-                  className="glass-card p-5 hover:border-[#ff375f]/30 transition-all group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <action.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-white mb-1">{action.label}</h3>
-                  <p className="text-sm text-white/50">{action.desc}</p>
-                </Link>
+                  <Link
+                    to={action.path}
+                    className="block glass-card p-5 hover:border-white/20 transition-all group"
+                  >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                      <action.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-white font-semibold mb-1 flex items-center gap-2">
+                      {action.label}
+                      <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </h3>
+                    <p className="text-white/50 text-sm">{action.description}</p>
+                  </Link>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </section>
 
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Recent Sites */}
-            <div className="lg:col-span-2 glass-card p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-white">Recent Sites</h2>
-                <Link to="/builder" className="text-sm text-[#ff375f] hover:underline flex items-center gap-1">
-                  View All <ArrowUpRight className="w-4 h-4" />
-                </Link>
+          {/* Stats */}
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold text-white mb-4">Overview</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {statCards.map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.1 }}
+                  className="glass-card p-5"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                    <span className="text-xs text-white/40">+12% this month</span>
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                  <div className="text-white/50 text-sm">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Recent Activity */}
+            <section className="lg:col-span-2">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
+                <button className="text-[#ff375f] text-sm hover:underline">View All</button>
               </div>
-
-              <div className="space-y-3">
-                {recentSites.map((site) => (
-                  <div key={site.id} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] hover:bg-white/[0.05] transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#ff375f]/20 to-[#ff6b35]/20 flex items-center justify-center">
-                        <Globe className="w-5 h-5 text-[#ff375f]" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-white">{site.name}</p>
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${site.status === 'published' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
-                            {site.status}
-                          </span>
-                          <span className="text-xs text-white/40">Score: {site.score}</span>
+              <div className="glass-card">
+                {isLoading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin w-8 h-8 border-2 border-[#ff375f] border-t-transparent rounded-full mx-auto" />
+                  </div>
+                ) : recentActivity.length > 0 ? (
+                  <div className="divide-y divide-white/5">
+                    {recentActivity.map((activity) => (
+                      <div key={activity.id} className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          activity.type === 'site_created' ? 'bg-blue-500/20 text-blue-400' :
+                          activity.type === 'page_generated' ? 'bg-green-500/20 text-green-400' :
+                          activity.type === 'rental_started' ? 'bg-purple-500/20 text-purple-400' :
+                          'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {activity.type === 'site_created' && <Globe className="w-5 h-5" />}
+                          {activity.type === 'page_generated' && <Layers className="w-5 h-5" />}
+                          {activity.type === 'rental_started' && <Users className="w-5 h-5" />}
+                          {activity.type === 'payment_received' && <DollarSign className="w-5 h-5" />}
                         </div>
+                        <div className="flex-1">
+                          <p className="text-white">{activity.title}</p>
+                          <p className="text-white/50 text-sm">{activity.timestamp}</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-white/20" />
                       </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <AlertCircle className="w-12 h-12 text-white/20 mx-auto mb-3" />
+                    <p className="text-white/50">No recent activity</p>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Tips & Resources */}
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-4">Tips & Resources</h2>
+              <div className="space-y-4">
+                <div className="glass-card p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#ff375f]/20 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-4 h-4 text-[#ff375f]" />
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-white/60">{site.traffic} clicks</p>
+                    <div>
+                      <h4 className="text-white font-medium mb-1">Try Puter.js AI</h4>
+                      <p className="text-white/50 text-sm mb-2">Generate websites and content for free with our AI agents.</p>
+                      <Link to="/ai-agents" className="text-[#ff375f] text-sm hover:underline">Learn more</Link>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <Link to="/builder" className="mt-4 w-full py-3 rounded-xl border border-dashed border-white/10 text-white/40 hover:text-white hover:border-white/20 transition-colors flex items-center justify-center gap-2">
-                <Plus className="w-4 h-4" /> Create New Site
-              </Link>
-            </div>
-
-            {/* Pro Tip */}
-            <div className="glass-card p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Pro Tip</h2>
-              <div className="p-4 rounded-xl bg-gradient-to-br from-[#ff375f]/10 to-[#ff6b35]/10 border border-[#ff375f]/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-[#ff375f]" />
-                  <span className="text-sm font-medium text-white">Increase Your Authority</span>
                 </div>
-                <p className="text-sm text-white/60">
-                  Sites with Flood Score 80+ get 3x more rental inquiries. Keep publishing quality content!
-                </p>
-              </div>
 
-              <div className="mt-6">
-                <h3 className="text-sm font-medium text-white mb-3">Your Plan</h3>
-                <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03]">
-                  <div>
-                    <p className="font-medium text-white capitalize">{user?.subscriptionTier}</p>
-                    <p className="text-xs text-white/40">{user?.role} account</p>
+                <div className="glass-card p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                      <TrendingUp className="w-4 h-4 text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium mb-1">Increase Your Authority</h4>
+                      <p className="text-white/50 text-sm mb-2">Generate more pages to boost your site's authority score.</p>
+                      <Link to="/mass-generator" className="text-[#ff375f] text-sm hover:underline">Get started</Link>
+                    </div>
                   </div>
-                  <Link to="/settings" className="text-sm text-[#ff375f] hover:underline">Upgrade</Link>
+                </div>
+
+                <div className="glass-card p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <DollarSign className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium mb-1">Rent Your Sites</h4>
+                      <p className="text-white/50 text-sm mb-2">Make your sites available for rent and earn passive income.</p>
+                      <Link to="/sites" className="text-[#ff375f] text-sm hover:underline">Manage sites</Link>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </main>
     </div>
   );
-};
-
-export default Dashboard;
+}
